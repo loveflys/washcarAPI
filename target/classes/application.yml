@@ -1,0 +1,6 @@
+server:
+  port: '9092'
+  context-path: '/'
+push:
+  appKey: "7c6f9e69d53c4168879c596e"
+  masterSecret: "787166d09d2a6191bb0c989b"

@@ -1,15 +1,10 @@
 package com.qgil.washcar.API.controller;
 
-import com.alibaba.fastjson.JSONArray;
-import com.qgil.washcar.API.entity.BaseEntity;
-import com.qgil.washcar.API.entity.PushConfig;
-import com.qgil.washcar.API.entity.PushExtra;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.websocket.CloseReason;
 import javax.websocket.EndpointConfig;
@@ -21,14 +16,9 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by 陈安一 on 2018/3/28.
@@ -37,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Component 
 @Controller
 public class PushController {
-	
+	protected org.slf4j.Logger log = LoggerFactory.getLogger(this.getClass());
 	private static Set<Session> sessions = Collections.synchronizedSet(new HashSet<Session>());
 	
 	private static PushController paySocket;  
@@ -65,7 +55,7 @@ public class PushController {
     @OnOpen
 	public void onOpen(Session session,EndpointConfig config, @PathParam("channel") String channel) {
 		if(StringUtils.isNotBlank(channel)) {
-			System.out.println("channel==>" + channel);
+			log.info("设备id-channel==>" + channel+"已连接socket");
     		session.getUserProperties().put("channel", channel);
         	sessions.add(session);
     	}
@@ -73,23 +63,18 @@ public class PushController {
 
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		for(Session s : sessions){
-			try {
-				s.getBasicRemote().sendText(message + "!!");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		log.info("客户端传来消息==>" + message);
 	}
 
 	@OnClose
 	public void onClose(Session session, CloseReason reason) {
+		log.info("连接已关闭");
 		sessions.remove(session);
 	}
 
 	@OnError
 	public void onError(Throwable t) {
-		System.out.println("Error : " + t.getMessage());
+		log.error("SocketServiceError : " + t.getMessage());
 	}
 	
 	public Set<Session> getSessions() {
@@ -99,12 +84,16 @@ public class PushController {
 	/**
 	 * 发送消息
 	 */
+	@SuppressWarnings("deprecation")
 	public static void sendMessage(String message, String channel) {
 		String sc = null; 
 		for(Session session : sessions){
 			sc = (String) session.getUserProperties().get("channel");
 			if(StringUtils.isNotBlank(sc) && sc.equals(channel)) {
 				try {
+					System.out.println("发送消息==>" + message);
+					System.out.println("发送至==>" + channel);
+					System.out.println("发送时间==>" + new Date().toLocaleString());
 					session.getBasicRemote().sendText(message);
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -112,14 +101,4 @@ public class PushController {
 			}
 		}
 	}
-	
-	@GetMapping("/test")
-    public void pushMessage (
-    		@RequestParam("msg") String msg,
-    		@RequestParam(value="channel", required = false, defaultValue = "") String channel) {
-    	Boolean result = false;
-    	
-    	paySocket.sendMessage(msg, channel);
-    	
-    }
 }

@@ -10,21 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.qgil.washcar.API.entity.Bill;
 import com.qgil.washcar.API.entity.ChannelMsgResHead;
 import com.qgil.washcar.API.entity.PayConst;
 import com.qgil.washcar.API.entity.PayResult;
-import com.qgil.washcar.API.entity.PushConfig;
 import com.qgil.washcar.API.entity.PushExtra;
 import com.qgil.washcar.API.entity.QrcodeResult;
 import com.qgil.washcar.API.entity.QrcodeResultEntity;
@@ -34,8 +30,7 @@ import com.qgil.washcar.API.utils.AESUtil;
 @Controller
 public class PayController {
 	protected Logger log = LoggerFactory.getLogger(this.getClass());
-	@Autowired
-	private PushConfig pushConfig;
+	@SuppressWarnings("deprecation")
 	@GetMapping("/getQrCode")
 	@ResponseBody
 	public QrcodeResultEntity getQrCode(@RequestParam(value="dataid", required = false, defaultValue = "") String dataid,
@@ -66,6 +61,7 @@ public class PayController {
         return result;
 	}
 	
+	@SuppressWarnings("static-access")
 	@PostMapping("/getresult")
 	@ResponseBody
 	public void getResult(HttpServletRequest request, HttpServletResponse response) {

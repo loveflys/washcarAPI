@@ -20,7 +20,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
   <dependencies>
-  	<dependency>
+  		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+  		<dependency>
 		    <groupId>cn.jpush.api</groupId>
 		    <artifactId>jpush-client</artifactId>
 		    <version>3.2.15</version>

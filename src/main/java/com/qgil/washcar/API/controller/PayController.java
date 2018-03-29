@@ -2,14 +2,12 @@ package com.qgil.washcar.API.controller;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.util.ByteArrayBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +16,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.qgil.washcar.API.entity.Bill;
 import com.qgil.washcar.API.entity.ChannelMsgResHead;
 import com.qgil.washcar.API.entity.PayConst;
 import com.qgil.washcar.API.entity.PayResult;
-import com.qgil.washcar.API.entity.PayResultEntity;
 import com.qgil.washcar.API.entity.PushConfig;
 import com.qgil.washcar.API.entity.PushExtra;
 import com.qgil.washcar.API.entity.QrcodeResult;
@@ -39,12 +38,14 @@ public class PayController {
 	private PushConfig pushConfig;
 	@GetMapping("/getQrCode")
 	@ResponseBody
-	public QrcodeResultEntity getQrCode(@RequestParam(value="dataid", required = false, defaultValue = "") String dataid) {
+	public QrcodeResultEntity getQrCode(@RequestParam(value="dataid", required = false, defaultValue = "") String dataid,
+			@RequestParam(value="cost", required = false, defaultValue = "15") String cost,
+			@RequestParam(value="deviceId", required = false, defaultValue = "") String deviceId) {
 		QrcodeResult res = new QrcodeResult();
 		QrcodeResultEntity result = new QrcodeResultEntity();
 		PayServices pay = new PayServices();
 		log.info("生成订单start===========");
-        Bill bill = pay.uploadBill();
+        Bill bill = pay.uploadBill(new BigDecimal(Double.parseDouble(cost)).setScale(2, BigDecimal.ROUND_HALF_UP), deviceId);
         log.info("生成订单====orderNo======="+bill.getOrderno());
         log.info("生成订单====标题======="+bill.getBilltitle());
         log.info("生成订单====时间======="+Calendar.getInstance().getTime().toLocaleString());
@@ -69,7 +70,6 @@ public class PayController {
 	@ResponseBody
 	public void getResult(HttpServletRequest request, HttpServletResponse response) {
 		PayResult payresult = new PayResult();
-		
 		try {
 			byte[] test = AESUtil.readStream(request.getInputStream());
 			String tempContent = new String(test);
@@ -81,7 +81,7 @@ public class PayController {
 	    	List<PushExtra> extralist = new ArrayList<PushExtra>();
 	        extralist.add(new PushExtra("id", payresult.getOrderNo()));
 	        extralist.add(new PushExtra("status", payresult.getOrderSts()));
-	        push.pushMessage("OR02".equals(payresult.getOrderSts())?"支付成功":"支付失败", "支付结果通知", content, JSONArray.toJSONString(extralist),pushConfig.getAppKey(),pushConfig.getMasterSecret());
+	        push.sendMessage(JSON.toJSONString(extralist), payresult.getDbtrNo());
 	        ChannelMsgResHead res = new ChannelMsgResHead();
 	        res.setProcd("AAAAAA");
 	        res.setProinfo("");

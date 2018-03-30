@@ -13,7 +13,6 @@ public class PayConst {
 	public static final String MERCHANT_NO_QQCT = rb.getString("merchant_no_qqct");//三期测温商户号
 	public static final String MERCHANT_NO_WASHCAR = rb.getString("merchant_no_washcar"); //洗车商户号
 	public static final String ORDER_TITLE = rb.getString("order_title"); //账单标题
-	public static final Double WASHCAR_COST = Double.parseDouble(rb.getString("washcar_cost")); //洗车费用
 	public static final String CHANID = rb.getString("chanid");	//业务来源  01xx 网上服务大厅， 02xx 舱单传输系统
 	public static final String LOGIN_TYPE = rb.getString("login_type");	//登录类型  0支付平台，1网上服务大厅， 2 舱单传输系统
 	public static final String NOTIFY_URL = rb.getString("notify_url");	//支付结果通知地址

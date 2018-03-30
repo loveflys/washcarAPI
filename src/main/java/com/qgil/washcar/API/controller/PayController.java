@@ -34,21 +34,20 @@ public class PayController {
 	@GetMapping("/getQrCode")
 	@ResponseBody
 	public QrcodeResultEntity getQrCode(@RequestParam(value="dataid", required = false, defaultValue = "") String dataid,
-			@RequestParam(value="cost", required = false, defaultValue = "15") String cost,
-			@RequestParam(value="deviceId", required = false, defaultValue = "") String deviceId) {
+			@RequestParam(value="cost", required = false, defaultValue = "15") String cost) {
 		QrcodeResult res = new QrcodeResult();
 		QrcodeResultEntity result = new QrcodeResultEntity();
 		PayServices pay = new PayServices();
-		log.info("生成订单start===========");
-        Bill bill = pay.uploadBill(new BigDecimal(Double.parseDouble(cost)).setScale(2, BigDecimal.ROUND_HALF_UP), deviceId);
-        log.info("生成订单====orderNo======="+bill.getOrderno());
-        log.info("生成订单====标题======="+bill.getBilltitle());
-        log.info("生成订单====时间======="+Calendar.getInstance().getTime().toLocaleString());
-        log.info("生成订单end===========");
-        log.info("申请支付获取二维码start===========");
+		log.info("getOrderstart===========");
+        Bill bill = pay.uploadBill(new BigDecimal(Double.parseDouble(cost)).setScale(2, BigDecimal.ROUND_HALF_UP));
+        log.info("getOrder====orderNo======="+bill.getOrderno());
+        log.info("getOrder====Title======="+bill.getBilltitle());
+        log.info("getOrder====Time======="+Calendar.getInstance().getTime().toLocaleString());
+        log.info("getOrderEnd===========");
+        log.info("ApplyPay&GetQrCodeStart===========");
         String qrcode = pay.payApply(bill.getOrderno(), "alipay".equals(dataid)?PayConst.PAYCHAN_ALIPAY:PayConst.PAYCHAN_WECHAT);
-        log.info("申请支付获取二维码result==>" + qrcode);
-        log.info("申请支付获取二维码end===========");
+        log.info("ApplyPay&GetQrCode==result==>" + qrcode);
+        log.info("ApplyPay&GetQrCode==end===========");
         if ("alipay".equals(dataid)) {
         	res.setAli_qrcode(qrcode);
         } else {
@@ -57,7 +56,6 @@ public class PayController {
         result.setOk();
         result.setQrcoderesult(res);
         result.setOrderid(bill.getOrderno());
-        result.setFee(PayConst.WASHCAR_COST);
         return result;
 	}
 	
@@ -70,14 +68,14 @@ public class PayController {
 			byte[] test = AESUtil.readStream(request.getInputStream());
 			String tempContent = new String(test);
 			String content = AESUtil.decrypt(tempContent, PayConst.SECRET_KEY);
-			log.info("支付回调==>" + ("OR02".equals(payresult.getOrderSts())?"支付成功":"支付失败"));
-			log.info("支付回调返回信息==>" + content);
+			log.info("paynotifyResult==>" + ("OR02".equals(payresult.getOrderSts())?"支付成功":"支付失败"));
+			log.info("payResultContent==>" + content);
 			payresult = JSONObject.parseObject(content, PayResult.class);			
 			PushController push = new PushController();
 	    	List<PushExtra> extralist = new ArrayList<PushExtra>();
 	        extralist.add(new PushExtra("id", payresult.getOrderNo()));
 	        extralist.add(new PushExtra("status", payresult.getOrderSts()));
-	        push.sendMessage(JSON.toJSONString(extralist), payresult.getDbtrNo());
+	        push.sendMessage(JSON.toJSONString(extralist), "notify");
 	        ChannelMsgResHead res = new ChannelMsgResHead();
 	        res.setProcd("AAAAAA");
 	        res.setProinfo("");
@@ -86,7 +84,7 @@ public class PayController {
 	        BufferedOutputStream out = new BufferedOutputStream(  
                     response.getOutputStream()); 
 			out.write(resp.getBytes());
-			log.info("输出到支付平台的通知==>" + resp);
+			log.info("returnnotify==>" + resp);
 			out.flush();  
 	        out.close(); 
 		} catch (IOException e) {

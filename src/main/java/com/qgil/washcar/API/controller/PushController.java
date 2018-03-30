@@ -1,7 +1,6 @@
 package com.qgil.washcar.API.controller;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,6 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 
 /**
  * Created by 陈安一 on 2018/3/28.
@@ -55,7 +58,7 @@ public class PushController {
     @OnOpen
 	public void onOpen(Session session,EndpointConfig config, @PathParam("channel") String channel) {
 		if(StringUtils.isNotBlank(channel)) {
-			log.info("设备id-channel==>" + channel+"已连接socket");
+			log.info("channel==>" + channel+"ConnectedSocket");
     		session.getUserProperties().put("channel", channel);
         	sessions.add(session);
     	}
@@ -63,12 +66,12 @@ public class PushController {
 
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		log.info("客户端传来消息==>" + message);
+		log.info("SocketAcceptMsg==>" + message);
 	}
 
 	@OnClose
 	public void onClose(Session session, CloseReason reason) {
-		log.info("连接已关闭");
+		log.info("SocketClose");
 		sessions.remove(session);
 	}
 
@@ -91,9 +94,9 @@ public class PushController {
 			sc = (String) session.getUserProperties().get("channel");
 			if(StringUtils.isNotBlank(sc) && sc.equals(channel)) {
 				try {
-					System.out.println("发送消息==>" + message);
-					System.out.println("发送至==>" + channel);
-					System.out.println("发送时间==>" + new Date().toLocaleString());
+					System.out.println("sendMessage==>" + message);
+					System.out.println("sendMessageTo==>" + channel);
+					System.out.println("sendMessageTime==>" + new Date().toLocaleString());
 					session.getBasicRemote().sendText(message);
 				} catch (IOException e) {
 					e.printStackTrace();

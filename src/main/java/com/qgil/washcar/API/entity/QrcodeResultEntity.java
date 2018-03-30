@@ -1,7 +1,6 @@
 package com.qgil.washcar.API.entity;
 
 public class QrcodeResultEntity extends BaseEntity {
-	private Double fee;
 	private QrcodeResult qrcoderesult;
 	private String orderid;
 	public QrcodeResult getQrcoderesult() {
@@ -18,14 +17,5 @@ public class QrcodeResultEntity extends BaseEntity {
 
 	public void setOrderid(String orderid) {
 		this.orderid = orderid;
-	}
-
-	public Double getFee() {
-		return fee;
-	}
-
-	public void setFee(Double fee) {
-		this.fee = fee;
-	}
-	
+	}	
 }

@@ -9,6 +9,7 @@ E:\workspace\API\src\main\java\com\qgil\washcar\API\CayApplication.java
 E:\workspace\API\src\main\java\com\qgil\washcar\API\entity\PushExtra.java
 E:\workspace\API\src\main\java\com\qgil\washcar\API\entity\BaseEntity.java
 E:\workspace\API\src\main\java\com\qgil\washcar\API\utils\SingletonManager.java
+E:\workspace\API\src\main\java\com\qgil\washcar\API\config\WebSocketConfig.java
 E:\workspace\API\src\main\java\com\qgil\washcar\API\entity\Bill.java
 E:\workspace\API\src\main\java\com\qgil\washcar\API\utils\AESUtil.java
 E:\workspace\API\src\main\java\com\qgil\washcar\API\entity\BillDetail.java

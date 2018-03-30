@@ -28,7 +28,7 @@ public class PayServices {
      * 上传账单
      * @return
      */
-    public Bill uploadBill(BigDecimal cost, String deviceId) {
+    public Bill uploadBill(BigDecimal cost) {
         Bill bill = new Bill(PayConst.MERCHANT_NO_WASHCAR);
         List<BillDetail> details = new ArrayList<BillDetail>();
         BillDetail detail = new BillDetail(PayConst.ORDER_TITLE);
@@ -41,7 +41,6 @@ public class PayServices {
         detail.setUnefftime("");//失效时间
         details.add(detail);
         bill.setBillDetail(details);
-        bill.setDbtrNo(deviceId);
         bill.setNotifyurl(PayConst.NOTIFY_URL);
         try {
             String result = HttpRequestUtil.doPost(PayConst.PAY_URL, new String(AESUtil.encrypt(EncodeByGson(bill) , PayConst.SECRET_KEY)));
